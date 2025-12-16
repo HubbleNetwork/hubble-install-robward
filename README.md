@@ -1,6 +1,6 @@
 # Hubble Network Smart Installer
 
-Cross-platform installer for Hubble Network developer boards. Flash Nordic and Silicon Labs boards in under 30 seconds.
+Cross-platform installer for Hubble Network developer boards. Flash Nordic and Texas Instruments boards in under 30 seconds.
 
 ## Quick Start
 
@@ -20,7 +20,7 @@ iex (irm https://get.hubble.com)
 
 The installer will:
 1. Detect your OS and architecture automatically
-2. Download the appropriate binary
+2. Download the appropriate binary for your board
 3. Run the installer immediately
 4. Clean up after completion
 
@@ -44,7 +44,7 @@ To verify a binary manually:
 The installer requires network access and elevated permissions to:
 - **Download dependencies** (uv, segger-jlink) via your system's package manager
 - **Flash firmware** to your connected developer board via USB
-- **Communicate with Hubble APIs** to fetch the appropriate firmware for your board
+- **Communicate with Hubble APIs** to register and name your board as a device belonging to your organization
 
 The installer does **not**:
 - Collect telemetry or usage data
@@ -81,6 +81,7 @@ This encoding:
 - Can be decoded with: `echo "<base64-string>" | base64 -d`
 
 If the credentials cannot be validated (invalid format or incomplete paste), the installer will prompt you to either retry or enter credentials manually.
+Learn about API access on our [Docs site](https://docs.hubble.com/docs/api-specification/hubble-platform-api#api-access).
 
 ## Supported Developer Boards
 
@@ -89,8 +90,8 @@ If the credentials cannot be validated (invalid format or incomplete paste), the
 - nRF52840 DK
 
 ### Texas Instruments
-- TI CC2340R5 Launchpad
 - TI CC2340R53 Launchpad
+- TI CC2340R5 Launchpad
 
 ## What It Does
 
@@ -103,7 +104,7 @@ The installer will:
    - **macOS**: Homebrew, uv, segger-jlink
    - **Linux**: uv, segger-jlink
    - **Windows**: Chocolatey, uv, nrfjprog
-5. ⚡ **Flash your board** with the appropriate firmware
+5. ⚡ **Flash your board** with the appropriate firmware, or generate .hex binary file with the firmware image (TI)
 6. ✅ **Verify the installation** was successful
 
 **Total time: < 30 seconds** (after dependencies are installed)
@@ -221,7 +222,7 @@ The installer automatically installs these runtime dependencies:
 ## Troubleshooting
 
 ### macOS: "Permission denied" when installing Homebrew
-This is expected. Enter your password when prompted.
+This is expected. Enter your laptop password when prompted.
 
 ### Windows: "Administrator privileges required"
 Right-click PowerShell and select "Run as administrator" before running the installer.
@@ -234,6 +235,9 @@ Right-click PowerShell and select "Run as administrator" before running the inst
 
 ### Dependencies not found after installation
 Restart your terminal to refresh your PATH.
+
+If you have more questions, review the [Dash Quick Start guide](https://docs.hubble.com/docs/guides/dashboard/dash-quick-start) on the Docs site, 
+or reach out to Hubble Support.
 
 ## License
 
