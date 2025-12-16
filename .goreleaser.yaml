@@ -1,0 +1,137 @@
+# GoReleaser configuration for hubble-install
+# See https://goreleaser.com for full documentation
+
+version: 2
+
+before:
+  hooks:
+    # Tidy and download dependencies
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: hubble-install
+    main: ./main.go
+    binary: hubble-install
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Exclude unsupported combinations
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.Commit={{.Commit}}
+      - -X main.Date={{.Date}}
+
+# Binary-only distribution (like Docker's approach)
+# This creates individual binaries instead of archives
+archives:
+  - id: hubble-install-archive
+    formats: ['binary']
+    name_template: >-
+      hubble-install-
+      {{- .Os }}-
+      {{- if eq .Arch "amd64" }}amd64
+      {{- else if eq .Arch "arm64" }}arm64
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+
+# Checksums for verification (SHA256)
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+# Generate changelog from git commits
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^chore:'
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: 'New Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug Fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Performance Improvements'
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: 'Other Changes'
+      order: 999
+
+# GitHub Release configuration
+release:
+  # Repository is automatically detected from git remote
+  # Override only if needed: github: { owner: HubbleNetwork, name: hubble-install }
+  draft: false
+  prerelease: auto
+  mode: replace
+  header: |
+    ## Hubble Network Installer {{ .Tag }}
+    
+    Cross-platform installer for Hubble Network developer boards.
+    
+    ### Installation
+    
+    **Quick Install (Recommended):**
+    ```bash
+    curl -fsSL https://get.hubble.com | bash
+    ```
+    
+    **Manual Download:**
+    Download the binary for your platform below, verify the checksum, make it executable, and run it.
+    
+    ### Verifying Downloads
+    
+    ```bash
+    # Download binary and checksums
+    curl -LO https://github.com/HubbleNetwork/hubble-install/releases/download/{{ .Tag }}/hubble-install-<OS>-<ARCH>
+    curl -LO https://github.com/HubbleNetwork/hubble-install/releases/download/{{ .Tag }}/checksums.txt
+    
+    # Verify checksum
+    shasum -a 256 -c checksums.txt --ignore-missing
+    
+    # Make executable and run
+    chmod +x hubble-install-<OS>-<ARCH>
+    ./hubble-install-<OS>-<ARCH>
+    ```
+  footer: |
+    ---
+    
+    **Supported Platforms:**
+    - macOS (Intel & Apple Silicon)
+    - Linux (amd64 & arm64)
+    - Windows (amd64)
+    
+    **Supported Developer Boards:**
+    - Nordic: nRF21540 DK, nRF52840 DK, nRF52 DK
+    - Silicon Labs: xG22 EK4108A, xG24 EK2703A
+    
+    ---
+    
+    Made with 🛰️ by [Hubble Network](https://hubble.com)
+
+# Snapshots for testing (no git tag required)
+snapshot:
+  version_template: '{{ incpatch .Version }}-next'
+
+# Announce releases (optional - can be extended later)
+# announce:
+#   skip: true
+
