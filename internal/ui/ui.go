@@ -212,9 +212,9 @@ func PrintCompletionBanner(duration time.Duration, orgID, apiToken, deviceName s
 	fmt.Println("  • In Sandbox, you will need the Hubble Connect mobile app to scan for device packets")
 	fmt.Println()
 	fmt.Println()
-	fmt.Println("╔══════════════════════════════════════════════════════════════════════════════════════════════╗")
-	fmt.Println("║ Return to https://dash.hubble.com to download Hubble Connect and view device detections!     ║")
-	fmt.Println("╚══════════════════════════════════════════════════════════════════════════════════════════════╝")
+	fmt.Println("╔══════════════════════════════════════════════════════════════════╗")
+	fmt.Println("║ Return to https://dash.hubble.com to capture device packets!     ║")
+	fmt.Println("╚══════════════════════════════════════════════════════════════════╝")
 	fmt.Println()
 
 	yellow.Println("Need help? Visit https://hubble.com/support/")
@@ -224,7 +224,7 @@ func PrintCompletionBanner(duration time.Duration, orgID, apiToken, deviceName s
 func PrintUniflashCompletionBanner(duration time.Duration, hexFilePath, boardName string) {
 	green.Print(`
 ╔═══════════════════════════════════════════════════════════╗
-║     ✓ Hex File Generated!                                 ║
+║                  ✓ Hex File Generated!                    ║
 ╚═══════════════════════════════════════════════════════════╝
 `)
 
@@ -232,12 +232,14 @@ func PrintUniflashCompletionBanner(duration time.Duration, hexFilePath, boardNam
 	fmt.Println()
 	green.Println("✓  What's next")
 	fmt.Println()
-	fmt.Printf("  Your hex file for the %s has been generated:\n", boardName)
+    fmt.Printf("  • Your new device is named \"%s\"\n", deviceName)
+	fmt.Println()
+	fmt.Printf("  • Your hex file for the %s has been generated:\n", boardName)
 	fmt.Println()
 	bold.Printf("    %s\n", hexFilePath)
 	fmt.Println()
 	fmt.Println("╔══════════════════════════════════════════════════════════════════╗")
-	fmt.Println("║ Return to https://dash.hubble.com to complete Uniflash steps!    ║")
+	fmt.Println("║ Return to https://dash.hubble.com to complete UniFlash steps!    ║")
 	fmt.Println("╚══════════════════════════════════════════════════════════════════╝")
 	fmt.Println()
 
