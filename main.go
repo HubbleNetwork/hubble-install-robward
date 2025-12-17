@@ -61,7 +61,7 @@ func main() {
 		fmt.Println()
 		ui.PrintInfo("We've pre-filled your credentials for this command.")
 		fmt.Println()
-		fmt.Println("Your Hubble Org ID and API Token are used to register your board to your organization.")
+		fmt.PrintInfo("Your Hubble Org ID and API Token are used to register your board to your organization.")
 		fmt.Println()
 	}
 
