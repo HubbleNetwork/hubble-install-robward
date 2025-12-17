@@ -93,6 +93,8 @@ Learn about API access on our [Docs site](https://docs.hubble.com/docs/api-speci
 - TI CC2340R53 Launchpad
 - TI CC2340R5 Launchpad
 
+You may access the firmware image source code for each supported board in the [Hubble TLDM](https://github.com/HubbleNetwork/hubble-tldm/tree/master) repository.
+
 ## What It Does
 
 The installer will:
