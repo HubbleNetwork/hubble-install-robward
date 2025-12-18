@@ -37,6 +37,13 @@ func (l *LinuxInstaller) Name() string {
 	return "Linux"
 }
 
+// CheckPendingReboot checks if a system reboot is pending (not typically needed on Linux)
+func (l *LinuxInstaller) CheckPendingReboot() error {
+	// Linux doesn't typically require reboot checks for package installations
+	// (though some kernel updates do, they're not relevant for our dependencies)
+	return nil
+}
+
 // ensureSudoAccess validates sudo access upfront to avoid multiple password prompts
 func (l *LinuxInstaller) ensureSudoAccess() error {
 	// Check if we already have valid sudo credentials
@@ -76,6 +83,13 @@ func (l *LinuxInstaller) CheckPrerequisites(requiredDeps []string) ([]MissingDep
 			if !l.commandExists("uv") {
 				missing = append(missing, MissingDependency{
 					Name:   "uv",
+					Status: "Not installed",
+				})
+			}
+		case "nrfutil":
+			if !l.commandExists("nrfutil") {
+				missing = append(missing, MissingDependency{
+					Name:   "nrfutil",
 					Status: "Not installed",
 				})
 			}
@@ -132,6 +146,23 @@ func (l *LinuxInstaller) InstallDependencies(deps []string) error {
 			} else {
 				ui.PrintSuccess("uv already installed")
 			}
+		case "nrfutil":
+			if l.commandExists("nrfutil") {
+				ui.PrintSuccess("nrfutil already installed")
+				break
+			}
+			uvPath, err := exec.LookPath("uv")
+			if err != nil {
+				return fmt.Errorf("uv not found in PATH (required to install nrfutil): %w", err)
+			}
+			ui.PrintInfo("Installing nrfutil (via uv tool install)...")
+			cmd := exec.Command(uvPath, "tool", "install", "nrfutil")
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			if err := cmd.Run(); err != nil {
+				return fmt.Errorf("failed to install nrfutil: %w", err)
+			}
+			ui.PrintSuccess("nrfutil installed successfully")
 		case "segger-jlink":
 			// J-Link must be installed manually on Linux - verified in CheckPrerequisites
 			if l.commandExists("JLinkExe") {

@@ -24,6 +24,12 @@ func (d *DarwinInstaller) Name() string {
 	return "macOS"
 }
 
+// CheckPendingReboot checks if a system reboot is pending (not typically needed on macOS)
+func (d *DarwinInstaller) CheckPendingReboot() error {
+	// macOS doesn't typically require reboot checks for package installations
+	return nil
+}
+
 // ensureSudoAccess validates sudo access upfront to avoid multiple password prompts
 func (d *DarwinInstaller) ensureSudoAccess() error {
 	// Check if we already have valid sudo credentials
@@ -66,6 +72,13 @@ func (d *DarwinInstaller) CheckPrerequisites(requiredDeps []string) ([]MissingDe
 			if !d.commandExists("uv") {
 				missing = append(missing, MissingDependency{
 					Name:   "uv",
+					Status: "Not installed",
+				})
+			}
+		case "nrfutil":
+			if !d.commandExists("nrfutil") {
+				missing = append(missing, MissingDependency{
+					Name:   "nrfutil",
 					Status: "Not installed",
 				})
 			}
@@ -160,6 +173,26 @@ func (d *DarwinInstaller) InstallDependencies(deps []string) error {
 					return
 				}
 				ui.PrintSuccess("uv installed successfully")
+
+			case "nrfutil":
+				if d.commandExists("nrfutil") {
+					ui.PrintSuccess("nrfutil already installed")
+					return
+				}
+				uvPath, err := exec.LookPath("uv")
+				if err != nil {
+					errChan <- fmt.Errorf("uv not found in PATH (required to install nrfutil): %w", err)
+					return
+				}
+				ui.PrintInfo("Installing nrfutil (via uv tool install)...")
+				cmd := exec.Command(uvPath, "tool", "install", "nrfutil")
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				if err := cmd.Run(); err != nil {
+					errChan <- fmt.Errorf("failed to install nrfutil: %w", err)
+					return
+				}
+				ui.PrintSuccess("nrfutil installed successfully")
 
 			case "segger-jlink":
 				if d.commandExists("JLinkExe") {

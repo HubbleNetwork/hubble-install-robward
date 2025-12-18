@@ -22,6 +22,9 @@ type Installer interface {
 	// Name returns the platform name
 	Name() string
 
+	// CheckPendingReboot checks if a system reboot is pending (platform-specific)
+	CheckPendingReboot() error
+
 	// CheckPrerequisites checks for missing dependencies based on required deps
 	CheckPrerequisites(requiredDeps []string) ([]MissingDependency, error)
 

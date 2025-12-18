@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/HubbleNetwork/hubble-install/internal/boards"
@@ -40,6 +41,21 @@ func main() {
 	if err != nil {
 		ui.PrintError(fmt.Sprintf("Platform detection failed: %v", err))
 		os.Exit(1)
+	}
+
+	// Check for pending reboot (especially important on Windows)
+	if err := installer.CheckPendingReboot(); err != nil {
+		fmt.Println()
+		ui.PrintWarning("═══════════════════════════════════════════════════════════════")
+		ui.PrintWarning("  SYSTEM REBOOT REQUIRED")
+		ui.PrintWarning("═══════════════════════════════════════════════════════════════")
+		fmt.Println()
+		ui.PrintWarning("A previous installation requires a system reboot before continuing.")
+		ui.PrintInfo(fmt.Sprintf("Reason: %v", err))
+		fmt.Println()
+		ui.PrintInfo("Please reboot your computer and run this installer again.")
+		fmt.Println()
+		os.Exit(2)
 	}
 
 	// =========================================================================
@@ -163,6 +179,27 @@ func main() {
 
 		// Install board-specific dependencies
 		if err := installer.InstallDependencies(requiredDeps); err != nil {
+			// Check if this is a reboot required error
+			if strings.Contains(err.Error(), "requires a system reboot") || strings.Contains(err.Error(), "RebootRequired") {
+				fmt.Println()
+				ui.PrintWarning("═══════════════════════════════════════════════════════════════")
+				ui.PrintWarning("  SYSTEM REBOOT REQUIRED")
+				ui.PrintWarning("═══════════════════════════════════════════════════════════════")
+				fmt.Println()
+				ui.PrintSuccess("Dependencies were installed successfully!")
+				fmt.Println()
+				ui.PrintWarning("However, system components were updated that require a reboot")
+				ui.PrintWarning("before you can continue.")
+				fmt.Println()
+				ui.PrintInfo("What to do next:")
+				ui.PrintInfo("  1. Reboot your computer")
+				ui.PrintInfo("  2. Run this installer again after rebooting")
+				ui.PrintInfo("  3. The installer will detect what's already installed and continue")
+				fmt.Println()
+				ui.PrintInfo("Note: If PowerShell doesn't work after reboot, use Command Prompt (cmd.exe)")
+				fmt.Println()
+				os.Exit(2) // Exit code 2 indicates reboot required
+			}
 			ui.PrintError(fmt.Sprintf("Dependency installation failed: %v", err))
 			os.Exit(1)
 		}

@@ -1,6 +1,6 @@
 # Makefile for Hubble Installer
 
-.PHONY: all build clean test run run-debug run-clean install uninstall deps fmt lint help
+.PHONY: all build clean test run run-debug run-clean install uninstall deps fmt lint help build-windows build-linux build-darwin build-darwin-arm build-all release-windows
 
 # Variables
 BINARY_NAME=hubble-install
@@ -18,6 +18,46 @@ build:
 	@mkdir -p $(BUILD_DIR)
 	$(GO) build $(GOFLAGS) -o $(BINARY_NAME) .
 	@echo "✓ Build complete: ./$(BINARY_NAME)"
+
+# Build for Windows (64-bit)
+build-windows:
+	@echo "Building $(BINARY_NAME) v$(VERSION) for Windows (amd64)..."
+	@mkdir -p $(BUILD_DIR)
+	GOOS=windows GOARCH=amd64 $(GO) build $(GOFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe .
+	@echo "✓ Build complete: $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe"
+
+# Build for Linux (64-bit)
+build-linux:
+	@echo "Building $(BINARY_NAME) v$(VERSION) for Linux (amd64)..."
+	@mkdir -p $(BUILD_DIR)
+	GOOS=linux GOARCH=amd64 $(GO) build $(GOFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 .
+	@echo "✓ Build complete: $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64"
+
+# Build for macOS (Intel)
+build-darwin:
+	@echo "Building $(BINARY_NAME) v$(VERSION) for macOS (amd64)..."
+	@mkdir -p $(BUILD_DIR)
+	GOOS=darwin GOARCH=amd64 $(GO) build $(GOFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 .
+	@echo "✓ Build complete: $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64"
+
+# Build for macOS (Apple Silicon)
+build-darwin-arm:
+	@echo "Building $(BINARY_NAME) v$(VERSION) for macOS (arm64)..."
+	@mkdir -p $(BUILD_DIR)
+	GOOS=darwin GOARCH=arm64 $(GO) build $(GOFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 .
+	@echo "✓ Build complete: $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64"
+
+# Build for all platforms
+build-all: build-windows build-linux build-darwin build-darwin-arm
+	@echo "✓ All platform builds complete"
+
+# Create a Windows release build (optimized, with version info)
+release-windows:
+	@echo "Creating Windows release v$(VERSION)..."
+	@mkdir -p $(BUILD_DIR)
+	GOOS=windows GOARCH=amd64 $(GO) build -ldflags "-s -w -X main.Version=$(VERSION)" -o $(BUILD_DIR)/$(BINARY_NAME)-v$(VERSION)-windows-amd64.exe .
+	@echo "✓ Release complete: $(BUILD_DIR)/$(BINARY_NAME)-v$(VERSION)-windows-amd64.exe"
+	@ls -lh $(BUILD_DIR)/$(BINARY_NAME)-v$(VERSION)-windows-amd64.exe
 
 # Run the installer
 run:
@@ -78,24 +118,34 @@ help:
 	@echo ""
 	@echo "Usage: make [target]"
 	@echo ""
-	@echo "Targets:"
+	@echo "Build Targets:"
 	@echo "  all              - Clean, download deps, and build (default)"
 	@echo "  build            - Build for current platform"
+	@echo "  build-windows    - Build for Windows (amd64)"
+	@echo "  build-linux      - Build for Linux (amd64)"
+	@echo "  build-darwin     - Build for macOS Intel (amd64)"
+	@echo "  build-darwin-arm - Build for macOS Apple Silicon (arm64)"
+	@echo "  build-all        - Build for all platforms"
+	@echo "  release-windows  - Create optimized Windows release build"
+	@echo ""
+	@echo "Development Targets:"
 	@echo "  run              - Run the installer directly"
 	@echo "  run-debug        - Run with debug mode (-debug flag)"
 	@echo "  run-clean        - Run clean mode (removes deps with verbose output and exits)"
 	@echo "  deps             - Download and tidy Go dependencies"
 	@echo "  test             - Run tests"
 	@echo "  clean            - Remove build artifacts"
-	@echo "  install          - Install to /usr/local/bin (requires sudo)"
-	@echo "  uninstall        - Remove from /usr/local/bin (requires sudo)"
 	@echo "  fmt              - Format Go code"
 	@echo "  lint             - Lint Go code (requires golangci-lint)"
-	@echo "  help             - Show this help message"
+	@echo ""
+	@echo "Installation Targets:"
+	@echo "  install          - Install to /usr/local/bin (requires sudo)"
+	@echo "  uninstall        - Remove from /usr/local/bin (requires sudo)"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make build               # Build for current platform"
-	@echo "  make run                 # Run the installer"
-	@echo "  make run-clean           # Remove dependencies (verbose)"
-	@echo "  make VERSION=0.2.0 build # Build with custom version"
+	@echo "  make build-windows           # Build for Windows"
+	@echo "  make release-windows         # Create Windows release"
+	@echo "  make VERSION=0.2.0 release-windows  # Release with version"
+	@echo "  make build-all               # Build for all platforms"
+	@echo "  make run                     # Run the installer"
 
