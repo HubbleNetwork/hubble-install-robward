@@ -77,7 +77,7 @@ func main() {
 		fmt.Println()
 		ui.PrintInfo("We've pre-filled your credentials for this command.")
 		fmt.Println()
-		fmt.PrintInfo("Your Hubble Org ID and API Token are used to register your board to your organization.")
+		ui.PrintInfo("Your Hubble Org ID and API Token are used to register your board to your organization.")
 		fmt.Println()
 	}
 
@@ -260,7 +260,7 @@ func main() {
 
 		// Print Uniflash completion banner
 		duration := time.Since(startTime)
-		ui.PrintUniflashCompletionBanner(duration, result.HexFilePath, selectedBoard.Name)
+		ui.PrintUniflashCompletionBanner(duration, result.HexFilePath, selectedBoard.Name, deviceName)
 	}
 
 	os.Exit(0)

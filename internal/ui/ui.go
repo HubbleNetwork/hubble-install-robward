@@ -221,7 +221,7 @@ func PrintCompletionBanner(duration time.Duration, orgID, apiToken, deviceName s
 }
 
 // PrintUniflashCompletionBanner prints the completion banner for TI Uniflash boards
-func PrintUniflashCompletionBanner(duration time.Duration, hexFilePath, boardName string) {
+func PrintUniflashCompletionBanner(duration time.Duration, hexFilePath, boardName, deviceName string) {
 	green.Print(`
 ╔═══════════════════════════════════════════════════════════╗
 ║                  ✓ Hex File Generated!                    ║
@@ -232,7 +232,7 @@ func PrintUniflashCompletionBanner(duration time.Duration, hexFilePath, boardNam
 	fmt.Println()
 	green.Println("✓  What's next")
 	fmt.Println()
-    fmt.Printf("  • Your new device is named \"%s\"\n", deviceName)
+	fmt.Printf("  • Your new device is named \"%s\"\n", deviceName)
 	fmt.Println()
 	fmt.Printf("  • Your hex file for the %s has been generated:\n", boardName)
 	fmt.Println()
